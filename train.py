@@ -48,38 +48,38 @@ if __name__ == '__main__':
 
 # Set the directory in Google Drive where models will be saved
 drive_model_dir = '/content/drive/MyDrive/DQN_v2'
-
-
-# Set up logging
-# Create a named logger to prevent duplicate handlers
-logger = logging.getLogger('DQN_Pong')
-logger.setLevel(logging.INFO)
-logger.propagate = False  # Prevent logs from being passed to the root logger
-
-# Prevent adding multiple handlers if the cell is rerun
-if not any(isinstance(handler, logging.FileHandler) for handler in logger.handlers):
-    # Create file handler which logs messages to a file
-    log_file_path = os.path.join(drive_model_dir, 'training_log.txt')
-    fh = logging.FileHandler(log_file_path)
-    fh.setLevel(logging.INFO)
-
-    # Create console handler with the same logging level
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.INFO)
-
-    # Create formatter and add it to the handlers
-    formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
-    fh.setFormatter(formatter)
-    ch.setFormatter(formatter)
-
-    # Add the handlers to the logger
-    logger.addHandler(fh)
-    logger.addHandler(ch)
-
-logger.info("Logging setup complete. Starting training...")
-# Create the directory if it doesn't exist
 if not os.path.exists(drive_model_dir):
     os.makedirs(drive_model_dir)
+
+
+    # Set up logging
+    # Create a named logger to prevent duplicate handlers
+    logger = logging.getLogger('DQN_Pong')
+    logger.setLevel(logging.INFO)
+    logger.propagate = False  # Prevent logs from being passed to the root logger
+
+    # Prevent adding multiple handlers if the cell is rerun
+    if not any(isinstance(handler, logging.FileHandler) for handler in logger.handlers):
+        # Create file handler which logs messages to a file
+        log_file_path = os.path.join(drive_model_dir, 'training_log.txt')
+        fh = logging.FileHandler(log_file_path)
+        fh.setLevel(logging.INFO)
+
+        # Create console handler with the same logging level
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+
+        # Create formatter and add it to the handlers
+        formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+        fh.setFormatter(formatter)
+        ch.setFormatter(formatter)
+
+        # Add the handlers to the logger
+        logger.addHandler(fh)
+        logger.addHandler(ch)
+
+    logger.info("Logging setup complete. Starting training...")
+    # Create the directory if it doesn't exist
 
     for episode in range(env_config['n_episodes']):
         #print(f'Starting episode: {episode}/10')
