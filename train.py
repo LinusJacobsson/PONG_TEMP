@@ -12,7 +12,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--env', choices=['ALE/Pong-v5'], default='ALE/Pong-v5')
-parser.add_argument('--evaluate_freq', type=int, default=10, help='How often to run evaluation.', nargs='?')
+parser.add_argument('--evaluate_freq', type=int, default=50, help='How often to run evaluation.', nargs='?')
 parser.add_argument('--evaluation_episodes', type=int, default=10, help='Number of evaluation episodes.', nargs='?')
 
 # Hyperparameter configurations for different environments. See config.py.
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     #################################################### LOGGING  ##############################################################################
 
 # Set the directory in Google Drive where models will be saved
-drive_model_dir = '/content/drive/MyDrive/DQN_Pong_models'
+drive_model_dir = '/content/drive/MyDrive/DQN_v2'
 
 
 # Set up logging
@@ -137,21 +137,23 @@ if not os.path.exists(drive_model_dir):
             #print("Optimization done, moving to next step.")
             step_counter += 1
             epsilon_decay_step += 1
-        print("Episode done.")
+        #print("Episode done.")
         # Evaluate the current agent.
-        #if episode % args.evaluate_freq == 0:
-        print(args.evaluation_episodes)
-        if True == True:
+        if episode % args.evaluate_freq == 0:
             mean_return = evaluate_policy(online_dqn, env, args, n_episodes=args.evaluation_episodes)
-            print(f'Episode {episode}/{env_config["n_episodes"]}: {mean_return}')
+            logger.info(f"Evaluation after {episode} episodes: Average reward: {mean_return}")
+            logger.info(f"Steps done: {step_counter}")
 
+            # Save current agent if it has the best performance so far.
             # Save current agent if it has the best performance so far.
             if mean_return > best_mean_return:
                 best_mean_return = mean_return
-
                 print(f'Best performance so far! Saving model.')
-                os.makedirs('models', exist_ok=True)
-                safe_env_name = args.env.replace('/', '_')
-                torch.save(online_dqn.state_dict(), f'models/{safe_env_name}_best.pt')
+                # Save the model directly to Google Drive
+                torch.save(online_dqn.state_dict(), os.path.join(drive_model_dir, f'{episode}_best.pt'))
+                model_save_path = os.path.join(drive_model_dir, f'best_checkpoint.pth')
+                logger.info(f"Saved best checkpoint at episode {episode} to {model_save_path}")
+
+
     # Close environment after training is completed.
     env.close()
